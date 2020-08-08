@@ -63,7 +63,7 @@ stage('Build') {
 		}
 		
 		stage('SonarQube Ananlysis End'){
-	bat '"dotnet-sonarscanner" end /k:jenkins-demo-project"
+	bat '"dotnet-sonarscanner" end /k:"jenkins-demo-project"'
 	}
  }
 }
