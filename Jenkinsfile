@@ -12,6 +12,9 @@ stage ('Checkout') {
             stash includes: '**', name: 'source', useDefaultExcludes: false
         }
     }
+	stage('SonarQube Ananlysis Begin'){
+	bat '"dotnet-sonarscanner" begin /k:jenkins-demo-project"
+	}
 stage ('Restore Packages') {     
          steps {
              deleteDir()
@@ -26,11 +29,9 @@ stage('Build') {
      steps {
             deleteDir()
             unstash 'source'
-            dir('DemoWebApplication\\DemoWebApplication'){
                 script{
-                    bat '"C:\\Program Files\\dotnet\\dotnet.exe" publish -c release -o /app' 
+                    bat '"C:\\Program Files\\dotnet\\dotnet.exe" build "DemoWebApplication\\DemoWebApplication.sln"'
                 }
-            }
 			echo "${workspace}"
       }
    }
@@ -60,6 +61,10 @@ stage('Build') {
 				])
 			}
 		}
+		
+		stage('SonarQube Ananlysis End'){
+	bat '"dotnet-sonarscanner" end /k:jenkins-demo-project"
+	}
  }
 }
 
