@@ -1,8 +1,17 @@
 pipeline {
 agent any
+
+environment
+{
+scannerHome = tool name:'sonar_scanner_msbuild'
+}
  
 options {
-    skipDefaultCheckout()
+    buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '10', daysToKeepStr: '', numToKeepStr: '5'))
+
+		disableConcurrentBuilds()
+		
+		skipDefaultCheckout()
 }
 
 stages {
@@ -14,7 +23,7 @@ stage ('Checkout') {
     }
 	stage('SonarQube Ananlysis Begin'){
 	steps{
-	bat '"C:\\Program Files\\dotnet\\dotnet.exe" "C:\\sonar-scanner-msbuild-4.10.0.19059-netcoreapp3.0\\SonarScanner.MSBuild.dll" begin /k:"DemoWebApplication" /d:sonar.host.url="http://localhost:9000" /d:sonar.login="83455cb30deee681aa37f5b8d2b66ad930d7e08a"'
+	bat '"C:\\Program Files\\dotnet\\dotnet.exe" ${scannerHome}\\SonarScanner.MSBuild.dll begin /k:"DemoWebApplication" /n:"DemoWebApplication" /v:1.0 /d:sonar.host.url="http://localhost:9000" /d:sonar.login="83455cb30deee681aa37f5b8d2b66ad930d7e08a"'
 	}
 	}
 stage ('Restore Packages') {     
@@ -66,7 +75,7 @@ stage('Build') {
 		
 		stage('SonarQube Ananlysis End'){
 		steps{
-	bat '"C:\\Program Files\\dotnet\\dotnet.exe" "C:\\sonar-scanner-msbuild-4.10.0.19059-netcoreapp3.0\\SonarScanner.MSBuild.dll" end /d:sonar.login="83455cb30deee681aa37f5b8d2b66ad930d7e08a"'
+	bat '"C:\\Program Files\\dotnet\\dotnet.exe" ${scannerHome}\\SonarScanner.MSBuild.dll\\SonarScanner.MSBuild.dll" end /d:sonar.login="83455cb30deee681aa37f5b8d2b66ad930d7e08a"'
 	}
 	}
  }
