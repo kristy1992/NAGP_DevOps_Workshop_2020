@@ -14,7 +14,7 @@ stage ('Checkout') {
     }
 	stage('SonarQube Ananlysis Begin'){
 	steps{
-	bat '"dotnet-sonarscanner" begin /k:"jenkins-demo-project"'
+	bat 'SonarScanner.MSBuild.dll begin /k:"DemoWebApplication" /d:sonar.host.url="http://localhost:9000" /d:sonar.login="83455cb30deee681aa37f5b8d2b66ad930d7e08a"'
 	}
 	}
 stage ('Restore Packages') {     
@@ -45,7 +45,7 @@ stage('Build') {
 					workspace = getWorkspace(pwd())
 				}
 				
-				bat '"C:\\Program Files\\opencover.4.7.922\\OpenCover.Console.exe" -register -target:"C:\\Program Files\\dotnet\\dotnet.exe" -targetargs:"test testcontainer:DemoWebApplication\\DemoTestProject\\bin\\Debug\\netcoreapp3.1\\DemoTestProject.dll --no-build --logger:trx"  -output:test_result_coverage.xml'
+				bat '"C:\\Program Files\\opencover.4.7.922\\OpenCover.Console.exe" -register -target:"C:\\Program Files\\dotnet\\dotnet.exe" -targetargs:"test DemoWebApplication\\DemoTestProject\\bin\\Debug\\netcoreapp3.1\\DemoTestProject.dll --no-build --logger:trx"  -output:test_result_coverage.xml'
 				bat '"C:\\Users\\kristy\\.nuget\\packages\\reportgenerator\\4.5.8\\tools\\netcoreapp3.0\\ReportGenerator.exe\" -reports:test_result_coverage.xml -targetdir:${workspace}\\TestResults'
 			}
 		}
@@ -66,7 +66,7 @@ stage('Build') {
 		
 		stage('SonarQube Ananlysis End'){
 		steps{
-	bat '"dotnet-sonarscanner" end /k:"jenkins-demo-project"'
+	bat 'SonarScanner.MSBuild.dll end /d:sonar.login="83455cb30deee681aa37f5b8d2b66ad930d7e08a"'
 	}
 	}
  }
