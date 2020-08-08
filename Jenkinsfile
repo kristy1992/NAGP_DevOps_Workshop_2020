@@ -38,7 +38,21 @@ stage('Build') {
    stage('Run MS Test') {
 			steps {
 				
-				bat '"C:\\Program Files\\opencover.4.7.922\\OpenCover.Console.exe" -register -target:"C:\\Program Files\\dotnet\\dotnet.exe" -targetargs:"test --no-build --logger:trx  -output:test_result_coverage.xml'
+				bat '"C:\\Program Files\\opencover.4.7.922\\OpenCover.Console.exe" -register -target:"C:\\Program Files\\dotnet\\dotnet.exe" -targetargs:"test --no-build --logger:trx"  -output:test_result_coverage.xml'
+			}
+		}
+		
+		stage('Publish test results'){
+			steps{
+				publishHTML([
+				  allowMissing: false,
+				  alwaysLinkToLastBuild: false,
+				  keepAll: true,
+				  reportDir: "TestResults\\",
+				  reportFiles: 'index.htm',
+				  reportName: 'Open Cover Report',
+				  reportTitles: ''
+				])
 			}
 		}
  }
