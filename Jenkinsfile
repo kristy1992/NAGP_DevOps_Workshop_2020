@@ -13,7 +13,7 @@ stage ('Checkout') {
         }
     }
 	stage('SonarQube Ananlysis Begin'){
-	bat '"dotnet-sonarscanner" begin /k:jenkins-demo-project"
+	bat '"dotnet-sonarscanner" begin /k:"jenkins-demo-project"'
 	}
 stage ('Restore Packages') {     
          steps {
