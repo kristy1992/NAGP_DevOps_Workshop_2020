@@ -13,7 +13,9 @@ stage ('Checkout') {
         }
     }
 	stage('SonarQube Ananlysis Begin'){
+	steps{
 	bat '"dotnet-sonarscanner" begin /k:"jenkins-demo-project"'
+	}
 	}
 stage ('Restore Packages') {     
          steps {
@@ -63,7 +65,9 @@ stage('Build') {
 		}
 		
 		stage('SonarQube Ananlysis End'){
+		steps{
 	bat '"dotnet-sonarscanner" end /k:"jenkins-demo-project"'
+	}
 	}
  }
 }
