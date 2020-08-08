@@ -32,7 +32,7 @@ stage('Build') {
             deleteDir()
             unstash 'source'
                 script{
-                    bat '"C:\\Program Files\\dotnet\\dotnet.exe" build "DemoWebApplication\\DemoWebApplication.sln"'
+                    bat '"C:\\Program Files\\dotnet\\dotnet.exe" mbuild "DemoWebApplication\\DemoWebApplication.sln" /t:Rebuild'
                 }
 			echo "${workspace}"
       }
