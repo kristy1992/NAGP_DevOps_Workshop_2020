@@ -71,6 +71,7 @@ stages {
 	
 	stage('Push Image to DTR'){
         steps{
+			bat 'docker tag demowebapplication kristy1992/nagpdevops2020:demowebapplication'
             bat 'docker push kristy1992/nagpdevops2020:demowebapplication'
         }
     }
