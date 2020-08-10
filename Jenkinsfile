@@ -69,6 +69,12 @@ stages {
         }
     }
 	
+	stage('Push Image to DTR'){
+        steps{
+            bat 'docker push kristy1992/nagpdevops2020:demowebapplication'
+        }
+    }
+	
 	stage('Publish test results'){
 		steps{
 			publishHTML([
