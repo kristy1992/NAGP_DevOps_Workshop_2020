@@ -7,14 +7,14 @@ pipeline {
 
 	    disableConcurrentBuilds()
 		
-	    skipDefaultCheckout()
+	    //skipDefaultCheckout()
     }
 
 stages {
     stage ('Checkout') {
         steps{
             checkout(scm)
-            stash includes: '**', name: 'source', useDefaultExcludes: false
+            //stash includes: '**', name: 'source', useDefaultExcludes: false
         }
     }
 	stage('SonarQube Ananlysis Begin') {
@@ -26,7 +26,7 @@ stages {
 	}
     stage ('Restore Packages') {     
         steps {
-            unstash 'source'
+            //unstash 'source'
             script {
                 bat '"C:\\Program Files\\dotnet\\dotnet.exe" restore "DemoWebApplication\\DemoWebApplication.sln" '
             }             
@@ -35,7 +35,7 @@ stages {
 
     stage('Build') {
         steps {
-            unstash 'source'
+            //unstash 'source'
             script{
                 bat '"C:\\Program Files\\dotnet\\dotnet.exe" build "DemoWebApplication\\DemoWebApplication.sln"'
             }
