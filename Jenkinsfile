@@ -65,7 +65,7 @@ stages {
 
     stage('Docker Create Image'){
         steps{
-            bat 'docker build -t demowebapplication:${BUILD_NUMBER} --no-cache -f dockerfile .'
+            bat 'docker build -t demowebapplication --no-cache -f dockerfile .'
         }
     }
 	
