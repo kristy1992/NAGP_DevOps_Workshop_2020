@@ -11,14 +11,14 @@ options {
 
 		disableConcurrentBuilds()
 		
-		skipDefaultCheckout()
+		//skipDefaultCheckout()
 }
 
 stages {
 stage ('Checkout') {
         steps{
             checkout(scm)
-            stash includes: '**', name: 'source', useDefaultExcludes: false
+            //stash includes: '**', name: 'source', useDefaultExcludes: false
         }
     }
 	stage('SonarQube Ananlysis Begin'){
@@ -31,7 +31,7 @@ stage ('Checkout') {
 stage ('Restore Packages') {     
          steps {
              deleteDir()
-             unstash 'source'
+             //unstash 'source'
              script {
                  bat '"C:\\Program Files\\dotnet\\dotnet.exe" restore "DemoWebApplication\\DemoWebApplication.sln" '
              }             
@@ -41,7 +41,7 @@ stage ('Restore Packages') {
 stage('Build') {
      steps {
             deleteDir()
-            unstash 'source'
+            //unstash 'source'
                 script{
                     bat '"C:\\Program Files\\dotnet\\dotnet.exe" build "DemoWebApplication\\DemoWebApplication.sln"'
                 }
@@ -61,7 +61,17 @@ stage('Build') {
 			}
 		}
 		
-		stage('Publish test results'){
+		
+		
+		stage('SonarQube Ananlysis End'){
+		steps{
+		withSonarQubeEnv('sonarqube'){
+	bat '"C:\\Program Files\\dotnet\\dotnet.exe" "C:\\Program Files (x86)\\Jenkins\\tools\\hudson.plugins.sonar.MsBuildSQRunnerInstallation\\sonarscanner\\SonarScanner.MSBuild.dll" end'
+	}
+	}
+	}
+	
+	stage('Publish test results'){
 			steps{
 				publishHTML([
 				  allowMissing: false,
@@ -74,14 +84,6 @@ stage('Build') {
 				])
 			}
 		}
-		
-		stage('SonarQube Ananlysis End'){
-		steps{
-		withSonarQubeEnv('sonarqube'){
-	bat '"C:\\Program Files\\dotnet\\dotnet.exe" "C:\\Program Files (x86)\\Jenkins\\tools\\hudson.plugins.sonar.MsBuildSQRunnerInstallation\\sonarscanner\\SonarScanner.MSBuild.dll" end'
-	}
-	}
-	}
  }
 }
 
