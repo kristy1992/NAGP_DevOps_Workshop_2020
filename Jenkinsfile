@@ -75,7 +75,7 @@ stage('Build') {
 		
 		stage('SonarQube Ananlysis End'){
 		steps{
-	bat '"C:\\Program Files\\dotnet\\dotnet.exe" "C:\\Program Files (x86)\\Jenkins\\tools\\hudson.plugins.sonar.MsBuildSQRunnerInstallation\\sonarscanner\\SonarScanner.MSBuild.dll" end /d:sonar.login="83455cb30deee681aa37f5b8d2b66ad930d7e08a"'
+	bat '"C:\\Program Files\\dotnet\\dotnet.exe" "C:\\Program Files (x86)\\Jenkins\\tools\\hudson.plugins.sonar.MsBuildSQRunnerInstallation\\sonarscanner\\SonarScanner.MSBuild.dll" end'
 	}
 	}
  }
