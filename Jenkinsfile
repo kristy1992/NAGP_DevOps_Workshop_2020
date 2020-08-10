@@ -76,6 +76,12 @@ stages {
         }
     }
 	
+	stage('Docker Deployment'){
+        steps{
+			bat 'docker run --name demowebapplicationcontainer -d -p 7000:8080 kristy1992/nagpdevops2020:demowebapplication'
+        }
+    }
+	
 	stage('Publish test results'){
 		steps{
 			publishHTML([
