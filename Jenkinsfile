@@ -1,58 +1,50 @@
 pipeline {
-agent any
 
-environment
-{
-scannerHome = tool name:'sonar_scanner_msbuild'
-}
- 
-options {
-    buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '10', daysToKeepStr: '', numToKeepStr: '5'))
+    agent any
 
-		disableConcurrentBuilds()
+    options {
+        buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '10', daysToKeepStr: '', numToKeepStr: '5'))
+
+	    disableConcurrentBuilds()
 		
-		//skipDefaultCheckout()
-}
+	    skipDefaultCheckout()
+    }
 
 stages {
-stage ('Checkout') {
+    stage ('Checkout') {
         steps{
             checkout(scm)
-            //stash includes: '**', name: 'source', useDefaultExcludes: false
+            stash includes: '**', name: 'source', useDefaultExcludes: false
         }
     }
-	stage('SonarQube Ananlysis Begin'){
-	steps{
-	withSonarQubeEnv('sonarqube'){
-	bat '"C:\\Program Files\\dotnet\\dotnet.exe" "C:\\Program Files (x86)\\Jenkins\\tools\\hudson.plugins.sonar.MsBuildSQRunnerInstallation\\sonarscanner\\SonarScanner.MSBuild.dll" begin /k:"DemoWebApplication" /n:"DemoWebApplication" /v:1.0'
+	stage('SonarQube Ananlysis Begin') {
+	    steps{
+	        withSonarQubeEnv('sonarqube'){
+	            bat '"C:\\Program Files\\dotnet\\dotnet.exe" "C:\\Program Files (x86)\\Jenkins\\tools\\hudson.plugins.sonar.MsBuildSQRunnerInstallation\\sonarscanner\\SonarScanner.MSBuild.dll" begin /k:"DemoWebApplication" /n:"DemoWebApplication" /v:1.0'
+	        }
+	    }
 	}
-	}
-	}
-stage ('Restore Packages') {     
-         steps {
-             //deleteDir()
-             //unstash 'source'
-             script {
-                 bat '"C:\\Program Files\\dotnet\\dotnet.exe" restore "DemoWebApplication\\DemoWebApplication.sln" '
-             }             
-          }
+    stage ('Restore Packages') {     
+        steps {
+            unstash 'source'
+            script {
+                bat '"C:\\Program Files\\dotnet\\dotnet.exe" restore "DemoWebApplication\\DemoWebApplication.sln" '
+            }             
         }
+    }
 
-stage('Build') {
-     steps {
-            //deleteDir()
-            //unstash 'source'
-                script{
-                    bat '"C:\\Program Files\\dotnet\\dotnet.exe" build "DemoWebApplication\\DemoWebApplication.sln"'
-                }
-			echo "${workspace}"
-      }
+    stage('Build') {
+        steps {
+            unstash 'source'
+            script{
+                bat '"C:\\Program Files\\dotnet\\dotnet.exe" build "DemoWebApplication\\DemoWebApplication.sln"'
+            }
+        }
    }
    
-   stage('Run MS Test') {
-			steps {
+    stage('Run MS Test') {
+		steps {
 			script {
-					
 					workspace = getWorkspace(pwd())
 				}
 				
@@ -63,17 +55,23 @@ stage('Build') {
 		
 		
 		
-		stage('SonarQube Ananlysis End'){
+	stage('SonarQube Ananlysis End'){
 		steps{
-		withSonarQubeEnv('sonarqube'){
-	bat '"C:\\Program Files\\dotnet\\dotnet.exe" "C:\\Program Files (x86)\\Jenkins\\tools\\hudson.plugins.sonar.MsBuildSQRunnerInstallation\\sonarscanner\\SonarScanner.MSBuild.dll" end'
+		    withSonarQubeEnv('sonarqube'){
+	            bat '"C:\\Program Files\\dotnet\\dotnet.exe" "C:\\Program Files (x86)\\Jenkins\\tools\\hudson.plugins.sonar.MsBuildSQRunnerInstallation\\sonarscanner\\SonarScanner.MSBuild.dll" end'
+	        }
+	    }
 	}
-	}
-	}
+
+    stage('Docker Create Image'){
+        steps{
+            bat docker build -t DemoWebApplication:${BUILD_NUMBER} --no-cache -f dockerfile .
+        }
+    }
 	
 	stage('Publish test results'){
-			steps{
-				publishHTML([
+		steps{
+			publishHTML([
 				  allowMissing: false,
 				  alwaysLinkToLastBuild: false,
 				  keepAll: true,
@@ -82,9 +80,9 @@ stage('Build') {
 				  reportName: 'Open Cover Report',
 				  reportTitles: ''
 				])
-			}
+            }
 		}
- }
+    }
 }
 
 String getWorkspace(String workspace){
