@@ -30,7 +30,7 @@ stage ('Checkout') {
 	}
 stage ('Restore Packages') {     
          steps {
-             deleteDir()
+             //deleteDir()
              //unstash 'source'
              script {
                  bat '"C:\\Program Files\\dotnet\\dotnet.exe" restore "DemoWebApplication\\DemoWebApplication.sln" '
@@ -40,7 +40,7 @@ stage ('Restore Packages') {
 
 stage('Build') {
      steps {
-            deleteDir()
+            //deleteDir()
             //unstash 'source'
                 script{
                     bat '"C:\\Program Files\\dotnet\\dotnet.exe" build "DemoWebApplication\\DemoWebApplication.sln"'
