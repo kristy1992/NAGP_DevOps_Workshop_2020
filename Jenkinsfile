@@ -23,7 +23,9 @@ stage ('Checkout') {
     }
 	stage('SonarQube Ananlysis Begin'){
 	steps{
-	bat '"C:\\Program Files\\dotnet\\dotnet.exe" "C:\\Program Files (x86)\\Jenkins\\tools\\hudson.plugins.sonar.MsBuildSQRunnerInstallation\\sonarscanner\\SonarScanner.MSBuild.dll" begin /k:"DemoWebApplication" /n:"DemoWebApplication" /v:1.0 /d:sonar.host.url="http://localhost:9000" /d:sonar.login="83455cb30deee681aa37f5b8d2b66ad930d7e08a"'
+	withSonarQubeEnv('sonarqube'){
+	bat '"C:\\Program Files\\dotnet\\dotnet.exe" "C:\\Program Files (x86)\\Jenkins\\tools\\hudson.plugins.sonar.MsBuildSQRunnerInstallation\\sonarscanner\\SonarScanner.MSBuild.dll" begin /k:"DemoWebApplication" /n:"DemoWebApplication" /v:1.0'
+	}
 	}
 	}
 stage ('Restore Packages') {     
@@ -75,7 +77,9 @@ stage('Build') {
 		
 		stage('SonarQube Ananlysis End'){
 		steps{
+		withSonarQubeEnv('sonarqube'){
 	bat '"C:\\Program Files\\dotnet\\dotnet.exe" "C:\\Program Files (x86)\\Jenkins\\tools\\hudson.plugins.sonar.MsBuildSQRunnerInstallation\\sonarscanner\\SonarScanner.MSBuild.dll" end'
+	}
 	}
 	}
  }
