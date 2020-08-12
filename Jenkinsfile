@@ -80,10 +80,10 @@ stages {
         steps{
 			script{
 				containerId = bat 'docker ps --filter expose=7000-8080/tcp --format "{{.ID}}"'
-				echo $containerId
-				if($containerId){
-					bat 'docker stop $containerId'
-					bat 'docker rm -f $containerId'
+				echo containerId
+				if(containerId){
+					bat 'docker stop containerId'
+					bat 'docker rm -f containerId'
 				}
 				bat 'docker run --name demowebapplicationcontainer -d -p 7000:8080 kristy1992/nagpdevops2020:demowebapplication'
 			}
