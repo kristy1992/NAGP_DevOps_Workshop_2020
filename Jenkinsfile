@@ -7,15 +7,16 @@ pipeline {
 
 	    disableConcurrentBuilds()
 		
-	    //skipDefaultCheckout()
+	    skipDefaultCheckout()
     }
 
 stages {
     stage ('Checkout') {
         steps{
             checkout(scm)
-            //stash includes: '**', name: 'source', useDefaultExcludes: false
+            stash includes: '**', name: 'source', useDefaultExcludes: false
         }
+		post { cleanup { deleteDir() } }
     }
 	stage('SonarQube Ananlysis Begin') {
 	    steps{
@@ -26,7 +27,7 @@ stages {
 	}
     stage ('Restore Packages') {     
         steps {
-            //unstash 'source'
+            unstash 'source'
             script {
                 bat '"C:\\Program Files\\dotnet\\dotnet.exe" restore "DemoWebApplication\\DemoWebApplication.sln" '
             }             
@@ -35,7 +36,7 @@ stages {
 
     stage('Build') {
         steps {
-            //unstash 'source'
+            unstash 'source'
             script{
                 bat '"C:\\Program Files\\dotnet\\dotnet.exe" build "DemoWebApplication\\DemoWebApplication.sln"'
             }
@@ -79,11 +80,11 @@ stages {
 	stage('Docker Deployment'){
         steps{
 			script{
-				containerId = bat 'docker ps --filter expose=7000-8080/tcp --format "{{.ID}}"'
-				echo containerId
+				containerId = powershell(script:'docker ps --filter expose=7000-8080/tcp --format "{{.ID}}"', returnStdout:true, label:'')
+				echo "containerid: ${containerId}"
 				if(containerId){
-					bat 'docker stop containerId'
-					bat 'docker rm -f containerId'
+					bat "docker stop ${containerId}"
+					bat "docker rm -f ${containerId}"
 				}
 				bat 'docker run --name demowebapplicationcontainer -d -p 7000:8080 kristy1992/nagpdevops2020:demowebapplication'
 			}
