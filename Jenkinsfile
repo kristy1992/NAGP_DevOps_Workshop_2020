@@ -16,15 +16,10 @@ stages {
             checkout(scm)
             stash includes: '**', name: 'source', useDefaultExcludes: false
         }
-		post { cleanup { deleteDir() } }
+		//post { cleanup { deleteDir() } }
     }
-	stage('SonarQube Ananlysis Begin') {
-	    steps{
-	        withSonarQubeEnv('sonarqube'){
-	            bat '"C:\\Program Files\\dotnet\\dotnet.exe" "C:\\Program Files (x86)\\Jenkins\\tools\\hudson.plugins.sonar.MsBuildSQRunnerInstallation\\sonarscanner\\SonarScanner.MSBuild.dll" begin /k:"DemoWebApplication" /n:"DemoWebApplication" /v:1.0'
-	        }
-	    }
-	}
+	
+	
     stage ('Restore Packages') {     
         steps {
             unstash 'source'
@@ -34,81 +29,8 @@ stages {
         }
     }
 
-    stage('Build') {
-        steps {
-            unstash 'source'
-            script{
-                bat '"C:\\Program Files\\dotnet\\dotnet.exe" build "DemoWebApplication\\DemoWebApplication.sln"'
-            }
-        }
-   }
-   
-    stage('Run MS Test') {
-		steps {
-			script {
-					workspace = getWorkspace(pwd())
-				}
-				
-				bat '"C:\\Program Files\\opencover.4.7.922\\OpenCover.Console.exe" -register -target:"C:\\Program Files\\dotnet\\dotnet.exe" -targetargs:"test DemoWebApplication\\DemoTestProject\\bin\\Debug\\netcoreapp3.0\\DemoTestProject.dll --no-build --logger:trx"  -output:test_result_coverage.xml'
-				bat '"C:\\Users\\kristy\\.nuget\\packages\\reportgenerator\\4.5.8\\tools\\netcoreapp3.0\\ReportGenerator.exe\" -reports:test_result_coverage.xml -targetdir:TestResults'
-			}
-		}
-		
-		
-		
-	stage('SonarQube Ananlysis End'){
-		steps{
-		    withSonarQubeEnv('sonarqube'){
-	            bat '"C:\\Program Files\\dotnet\\dotnet.exe" "C:\\Program Files (x86)\\Jenkins\\tools\\hudson.plugins.sonar.MsBuildSQRunnerInstallation\\sonarscanner\\SonarScanner.MSBuild.dll" end'
-	        }
-	    }
-	}
-
-    stage('Docker Create Image'){
-        steps{
-            bat 'docker build -t demowebapplication --no-cache -f dockerfile .'
-        }
-    }
-	
-	stage('Push Image to DTR'){
-        steps{
-			bat 'docker tag demowebapplication kristy1992/nagpdevops2020:demowebapplication'
-            bat 'docker push kristy1992/nagpdevops2020:demowebapplication'
-        }
-    }
-	
-	stage('Docker Deployment'){
-        steps{
-			script{
-				containerId = powershell(script:'docker ps --filter expose=7000-8080/tcp --format "{{.ID}}"', returnStdout:true, label:'')
-				echo "containerid: ${containerId}"
-				if(containerId){
-					bat "docker stop ${containerId}"
-					bat "docker rm -f ${containerId}"
-				}
-				bat 'docker run --name demowebapplicationcontainer -d -p 7000:8080 kristy1992/nagpdevops2020:demowebapplication'
-			}
-        }
-    }
-	
-	stage('Publish test results'){
-		steps{
-			publishHTML([
-				  allowMissing: false,
-				  alwaysLinkToLastBuild: false,
-				  keepAll: true,
-				  reportDir: "${workspace}\\TestResults\\",
-				  reportFiles: 'index.htm',
-				  reportName: 'Open Cover Report',
-				  reportTitles: ''
-				])
-            }
-		}
     }
 }
 
-String getWorkspace(String workspace){
-	return workspace.replace("/","\\")
-}
 
 
